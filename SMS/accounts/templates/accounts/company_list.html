@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registered Companies | Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+
+        /* Custom scrollbar for better UI */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Active Navigation Link Styling */
+        .active-nav {
+            background: #4f46e5;
+            color: white !important;
+            box-shadow: 0 4px 6px -1px rgb(79 70 229 / 0.1), 0 2px 4px -2px rgb(79 70 229 / 0.1);
+        }
+
+        /* Mobile Sidebar Animation Transition */
+        #mobile-sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-open {
+            transform: translateX(0);
+        }
+
+        .sidebar-closed {
+            transform: translateX(-100%);
+        }
+
+        /* Ensure table columns don't squish too much */
+        th, td {
+            white-space: nowrap;
+        }
+
+        /* Collapsed Sidebar Rules - ONLY apply on desktop */
+        @media (min-width: 768px) {
+            #mobile-sidebar.collapsed {
+                width: 5rem !important;
+            }
+
+            /* hide all text */
+            #mobile-sidebar.collapsed .sidebar-text,
+            #mobile-sidebar.collapsed .brand-info {
+                display: none;
+            }
+
+            /* center icons */
+            #mobile-sidebar.collapsed nav a {
+                justify-content: center !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            /* center icons perfectly */
+            #mobile-sidebar.collapsed nav a i {
+                margin: 0 auto;
+            }
+
+            /* hide headings like MAIN MENU / SETTINGS */
+            #mobile-sidebar.collapsed p {
+                display: none;
+            }
+
+            /* center logout */
+            #mobile-sidebar.collapsed .p-4 a {
+                justify-content: center !important;
+            }
+
+            /* Center the brand header when collapsed */
+            #mobile-sidebar.collapsed .brand-header {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            
+            #mobile-sidebar.collapsed .brand-logo-wrapper {
+                justify-content: center !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 overflow-hidden">
+
+    <!-- Sidebar Overlay (mobile only) -->
+    <div id="sidebar-overlay" 
+         class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden transition-opacity duration-300">
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside id="mobile-sidebar"
+            class="fixed md:relative top-0 left-0 w-64 bg-white border-r border-slate-200 flex flex-col h-screen shadow-xl z-50 sidebar-closed md:translate-x-0">
+
+            <!-- Sidebar Brand Header -->
+            <div class="brand-header p-6 border-b border-slate-100 flex items-center justify-between transition-all">
+                <div class="brand-logo-wrapper flex items-center gap-3 w-full">
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-200 shrink-0">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <!-- Added brand-info wrapper here so it hides smoothly on collapse -->
+                    <div class="brand-info overflow-hidden whitespace-nowrap">
+                        <h1 class="font-bold text-lg leading-none text-slate-800">Admin Panel</h1>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                            Management
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+                <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Main Menu</p>
+                
+                <a href="{% url 'admin_dashboard' %}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-indigo-600 rounded-xl transition-all duration-200">
+                    <i class="fas fa-chart-line w-5 text-center"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+
+                <a href="{% url 'company_list' %}"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl active-nav transition-all duration-200">
+                    <i class="fas fa-building w-5 text-center"></i>
+                    <span class="sidebar-text">Companies</span>
+                </a>
+
+                <div class="pt-4 mt-4 border-t border-slate-100">
+                    <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Settings</p>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-xl transition-all duration-200">
+                        <i class="fas fa-cog w-5 text-center"></i>
+                        <span class="sidebar-text">Site Settings</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Sidebar Footer / Logout -->
+            <div class="p-4 border-t border-slate-100">
+                <a href="{% url 'admin_logout' %}"
+                    class="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200">
+                    <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                    <span class="sidebar-text">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col overflow-hidden w-full">
+
+            <!-- HEADER - Enhanced Responsiveness for Small Screens (iPhone SE) -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-3 md:px-8 flex-shrink-0">
+
+                <div class="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+                    <!-- Mobile Hamburger Menu -->
+                   <button id="open-sidebar" class="p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+
+                    <!-- Page Title & Breadcrumb -->
+                    <div class="leading-tight min-w-0 pr-2">
+                        <h2 class="text-sm md:text-xl font-bold text-slate-800 truncate">
+                            Registered Companies
+                        </h2>
+                        <p class="hidden xs:block text-[10px] md:text-sm text-slate-500 truncate">
+                            Manage and overview all active organizations
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Button: Back to Dashboard -->
+                <div class="flex-shrink-0">
+                 <a href="{% url 'admin_dashboard' %}"
+                    class="flex items-center gap-2 text-sm md:text-base font-semibold text-slate-600 hover:text-indigo-600"
+                    title="Back to Dashboard"
+                    aria-label="Back to Dashboard">
+                    
+                    <i class="fas fa-arrow-left text-base"></i>
+                    
+                    <span>Back to Dashboard</span>
+                </a>
+                </div>
+
+            </header>
+
+            <!-- SCROLLABLE CONTENT BODY -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                <div class="max-w-6xl mx-auto space-y-6">
+
+                    <!-- Stats Quick Overview (Optional Extension) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Companies</p>
+                            <p class="text-2xl font-bold text-slate-800 mt-1">{{ companies|length }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Table Card -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+                        
+                        <!-- Card Header -->
+                        <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-list text-indigo-600 bg-indigo-50 p-2 rounded-lg"></i>
+                                Companies Registry
+                            </h3>
+                            
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400 italic">Showing active companies</span>
+                            </div>
+                        </div>
+
+                        <!-- Table Wrapper -->
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50/50 text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4 border-b border-slate-100">Company Name</th>
+                                        <th class="px-6 py-4 border-b border-slate-100">Email Address</th>
+                                        <th class="px-6 py-4 border-b border-slate-100">Primary Owner</th>
+                                        <th class="px-6 py-4 border-b border-slate-100 text-right">Administrative Actions</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody class="divide-y divide-slate-50">
+                                    {% for c in companies %}
+                                    <tr class="hover:bg-slate-50/80 transition-colors group">
+                                        <td class="px-6 py-5">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
+                                                    <i class="fas fa-building text-xs"></i>
+                                                </div>
+                                                <span class="font-semibold text-slate-700">{{ c.name }}</span>
+                                            </div>
+                                        </td>
+                                        
+                                        <td class="px-6 py-5 text-sm text-slate-600">
+                                            <div class="flex items-center gap-2">
+                                                <i class="far fa-envelope text-slate-300"></i>
+                                                {{ c.email }}
+                                            </div>
+                                        </td>
+                                        
+                                        <td class="px-6 py-5">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-full bg-indigo-50 flex items-center justify-center text-[10px] font-bold text-indigo-600">
+                                                    {{ c.owner.username|slice:":1"|upper }}
+                                                </div>
+                                                <span class="text-sm text-slate-700 font-medium">{{ c.owner.username }}</span>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-6 py-5 text-right">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <a href="{% url 'edit_company' c.id %}"
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                                                    <i class="fas fa-edit"></i>
+                                                    Edit
+                                                </a>
+
+                                                <form action="{% url 'delete_company' c.id %}" method="POST" class="inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit"
+                                                        onclick="return confirm('Attention: Are you sure you want to permanently delete this company record? This action cannot be undone.');"
+                                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                                                        <i class="fas fa-trash"></i>
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-24 text-center">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <div class="bg-slate-100 p-4 rounded-full mb-4 text-slate-300">
+                                                    <i class="fas fa-folder-open text-3xl"></i>
+                                                </div>
+                                                <h4 class="text-slate-800 font-bold">No Records Found</h4>
+                                                <p class="text-slate-400 text-sm mt-1 max-w-[200px] mx-auto">
+                                                    There are currently no registered companies in the database.
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Card Footer -->
+                        <div class="bg-slate-50/30 px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+                            <p class="text-[10px] md:text-xs text-slate-400 font-medium">
+                                Data is synced with production database
+                            </p>
+                            <button onclick="window.location.reload()" class="text-slate-400 hover:text-indigo-600 transition-colors">
+                                <i class="fas fa-sync-alt text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+   <script>
+        const sidebar = document.getElementById('mobile-sidebar');
+        const toggleBtn = document.getElementById('open-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        toggleBtn.addEventListener('click', () => {
+
+            if (window.innerWidth >= 768) {
+                // 👉 DESKTOP → COLLAPSE
+                sidebar.classList.toggle('collapsed');
+            } else {
+                // 👉 MOBILE → OPEN/CLOSE
+                if (sidebar.classList.contains('sidebar-open')) {
+                    sidebar.classList.remove('sidebar-open');
+                    sidebar.classList.add('sidebar-closed');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                } else {
+                    sidebar.classList.remove('sidebar-closed');
+                    sidebar.classList.add('sidebar-open');
+                    overlay.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+            sidebar.classList.add('sidebar-closed');
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+        
+        // Ensure sidebar functions correctly if resized across breakpoints
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+                sidebar.classList.remove('sidebar-open');
+            }
+        });
+    </script>
+
+</body>
+</html>
